@@ -24,14 +24,6 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2023-05-01' = {
         name: storageSubnetName
         properties: {
           addressPrefix: storageSubnetPrefix
-          serviceEndpoints: [
-            {
-              locations: [
-                location
-              ]
-              service: 'Microsoft.Storage'
-            }
-          ]
         }
       }
     ]
@@ -42,54 +34,6 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2023-05-01' = {
 param resourceBaseName string
 
 param location string = 'Central US'
-
-@description('Sku of the storage account')
-param storageAccountSkuName string = 'Standard_LRS'
-
-@description('The kind of storage that the storage account will use. Is limited to General-Purpose V2 for Standard and BlockBlobStorage for Premium')
-@allowed([
-  'StorageV2'
-  'BlockBlobStorage'
-])
-param storageAccountKind string
-
-resource storageAccount 'Microsoft.Storage/storageAccounts@2023-01-01' = {
-  name: '${resourceBaseName}jimmystorage'
-  location: location
-  sku: {
-    name: storageAccountSkuName
-  }
-  kind: storageAccountKind
-  properties: {
-    accessTier: 'Hot'
-    allowBlobPublicAccess: true
-    allowCrossTenantReplication: false
-    allowedCopyScope: 'AAD'
-    isHnsEnabled: true
-    isLocalUserEnabled: true
-    isNfsV3Enabled: false
-    isSftpEnabled: true
-    minimumTlsVersion: 'TLS1_2'
-    networkAcls: {
-      defaultAction: 'Allow'
-      virtualNetworkRules: [
-        {
-          action: 'Allow'
-          id: virtualNetwork.properties.subnets[0].id
-        }
-      ]
-    }
-    publicNetworkAccess: 'Enabled'
-    routingPreference: {
-      routingChoice: 'MicrosoftRouting'
-    }
-    supportsHttpsTrafficOnly: true
-  }
-}
-
-resource fileShare 'Microsoft.Storage/storageAccounts/fileServices/shares@2023-01-01' = {
-  name: '${storageAccount.name}/default/${resourceBaseName}-data'  
-}
 
 @description('Provide the administrator login name for the MySQL server.')
 param administratorLogin string
@@ -147,7 +91,7 @@ param backupRetentionDays int = 7
 ])
 param geoRedundantBackup string = 'Disabled'
 
-param databaseName string = 'nextcloud'
+param databaseName string = 'blogifier'
 
 resource mySQLServer 'Microsoft.DBforMySQL/flexibleServers@2023-06-30' = {
   name: toLower(resourceBaseName)
@@ -174,6 +118,9 @@ resource mySQLServer 'Microsoft.DBforMySQL/flexibleServers@2023-06-30' = {
       backupRetentionDays: backupRetentionDays
       geoRedundantBackup: geoRedundantBackup
     }
+    network: {
+      publicNetworkAccess: 'Enabled'
+    }
   }
 }
 
@@ -182,7 +129,25 @@ resource nextcloud_database 'Microsoft.DBforMySQL/flexibleServers/databases@2023
   name: databaseName
   properties: {
     charset: 'utf8mb4'
-    collation: 'utf8mb4_general_ci'
+    collation: 'utf8mb4_unicode_ci'
 
+  }
+}
+
+
+resource redisCache 'Microsoft.Cache/redis@2023-08-01' = {
+  location: location
+  name: toLower(resourceBaseName)
+  properties: {
+    enableNonSslPort: true
+    publicNetworkAccess: 'Enabled'
+    redisConfiguration: {
+
+    }
+    sku: {
+      capacity: 1
+      family: 'C'
+      name: 'Standard'
+    }
   }
 }
