@@ -43,6 +43,7 @@ az webapp vnet-integration add --name $appName --resource-group $ResourceGroupNa
 # Create app-insights
 az monitor app-insights component create --app $appName --location $location --resource-group $ResourceGroupName
 $appInsightsConnectionString = az monitor app-insights component show --app $appName --resource-group $ResourceGroupName --query "connectionString"
+$appInsightsConnectionString = appInsightsConnectionString -replace "`"", ""
 
 # Get the FQDN for the Azure Database for Mysql Flexible Server
 $mySqlHostname = az mysql flexible-server show --name ${mySQlServerName} --resource-group ${ResourceGroupName} --query 'fullyQualifiedDomainName'
