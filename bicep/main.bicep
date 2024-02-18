@@ -1,14 +1,20 @@
 @description('name of the Vnet we will attach our VM to')
 param vnetName string
 
-@description('Subnet we will attach our VM to')
-param storageSubnetName string = 'storage'
-
 @description('Provide Virtual Network Address Prefix')
 param vnetAddressPrefix string = '10.1.0.0/16'
 
+@description('Subnet we will attach our Web App to')
+param appSubnetName string = 'app'
+
 @description('Provide VM Subnet Address Prefix')
-param storageSubnetPrefix string = '10.1.0.0/24'
+param appSubnetPrefix string = '10.1.0.0/24'
+
+@description('Subnet we will attach our database to')
+param dbSubnetName string = 'database'
+
+@description('Provide Subnet Address Prefix')
+param dbSubnetPrefix string = '10.1.1.0/24'
 
 resource virtualNetwork 'Microsoft.Network/virtualNetworks@2023-05-01' = {
   name: vnetName
@@ -21,9 +27,23 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2023-05-01' = {
     }
     subnets: [
       {
-        name: storageSubnetName
+        name: appSubnetName
         properties: {
-          addressPrefix: storageSubnetPrefix
+          addressPrefix: appSubnetPrefix
+        }
+      }
+      {
+        name: dbSubnetName
+        properties: {
+          addressPrefix: dbSubnetPrefix
+          delegations: [
+            {
+              name: 'MySQLflexibleServers'
+              properties: {
+                serviceName: 'Microsoft.DBforMySQL/flexibleServers'
+              }
+            }
+          ]
         }
       }
     ]
@@ -119,7 +139,7 @@ resource mySQLServer 'Microsoft.DBforMySQL/flexibleServers@2023-06-30' = {
       geoRedundantBackup: geoRedundantBackup
     }
     network: {
-      publicNetworkAccess: 'Enabled'
+      delegatedSubnetResourceId: virtualNetwork.properties.subnets[1].id
     }
   }
 }
