@@ -13,7 +13,10 @@ jobs:
         ScriptType: 'InlineScript'
         azurePowerShellVersion: 'LatestVersion'
         pwsh: true
-        Inline: 'New-AzResourceGroupDeployment -ResourceGroupName $(ResourceGroupName) -Name main -TemplateFile $(System.DefaultWorkingDirectory)/bicep/main.bicep -resourceBaseName $(ResourceBaseName) -location "$(Location)" -vnetName $(VnetName) -administratorLogin $(DBAdminName) -administratorLoginPassword $(DBPassword)' 
+        Inline: |
+          New-AzResourceGroup -ResourceGroupName $(ResourceGroupName) -Location "$(Location)"
+          $DBAdminPassword = ConvertTo-SecureString $(DBPassword) -AsPlainText -Force
+          New-AzResourceGroupDeployment -ResourceGroupName $(ResourceGroupName) -Name main -TemplateFile $(System.DefaultWorkingDirectory)/bicep/main.bicep -resourceBaseName $(ResourceBaseName) -location "$(Location)" -vnetName $(VnetName) -administratorLogin $(DBAdminName) -administratorLoginPassword ${DBAdminPassword}
     - task: AzureCLI@2
       displayName: Deploy App Service and Partially Configure
       inputs:
