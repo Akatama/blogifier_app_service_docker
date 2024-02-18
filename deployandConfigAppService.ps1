@@ -45,11 +45,15 @@ az monitor app-insights component create --app $appName --location $location --r
 $appInsightsConnectionString = az monitor app-insights component show --app $appName --resource-group $ResourceGroupName --query "connectionString"
 
 # Get the FQDN for the Azure Database for Mysql Flexible Server
-$mySqlHostname = az mysql flexible-server show --name blogifier --resource-group blogifier --query 'fullyQualifiedDomainName'
+$mySqlHostname = az mysql flexible-server show --name ${mySQlServerName} --resource-group ${ResourceGroupName} --query 'fullyQualifiedDomainName'
+# Remove the " characters
+$mySqlHostname = $mySqlHostname -replace "`"", ""
 
 # Get the FQDN and the password for Azure Cache for Redis
-$redisHostname = az redis show --name blogifier --resource-group blogifier --query 'hostName'
-$redisKey = az redis list-keys --name blogifier --resource-group blogifier --query 'primaryKey'
+$redisHostname = az redis show --name ${redisCacheName} --resource-group ${ResourceGroupName} --query 'hostName'
+$redisHostname = $redisHostname -replace "`"", ""
+$redisKey = az redis list-keys --name ${redisCacheName} --resource-group ${ResourceGroupName} --query 'primaryKey'
+$redisKey = $redisKey -replace "`"", ""
 
 # Add the webapp app settings
 az webapp config appsettings set --name $appName --resource-group $ResourceGroupName --settings TZ="America/Los_Angeles" Blogifier__DbProvider="MySql" `
