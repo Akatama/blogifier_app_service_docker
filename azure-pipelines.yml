@@ -1,0 +1,34 @@
+trigger: none
+
+pool:
+  vmImage: ubuntu-latest
+
+jobs:
+  - job: Run_App_Service_Deploy_Script
+    timeoutInMinutes: 30
+    steps:
+    - task: AzurePowerShell@5
+      displayName: Deploy Database and Storage Account
+      inputs:
+        azureSubscription: 'cccis-jlindsey-sandbox(ff95cccd-cbb7-41a2-b4ba-41917218c03c)'
+        ScriptType: 'FilePath'
+        ScriptPath: '$(System.DefaultWorkingDirectory)/deployNecessaryServices.ps1'
+        ScriptArguments: '-ResourceBaseName $(ResourceBaseName) -ResourceGroupName $(ResourceGroupName) -Location "$(Location)" -VNetName $(VNetName) -DBAdminName $(DBAdminName) -DBPassword $(DBPassword)'
+        azurePowerShellVersion: 'LatestVersion'
+        pwsh: true
+        workingDirectory: '$(System.DefaultWorkingDirectory)'
+    - task: AzureCLI@2
+      inputs:
+        azureSubscription: 'cccis-jlindsey-sandbox(ff95cccd-cbb7-41a2-b4ba-41917218c03c)'
+        scriptType: 'pscore'
+        scriptLocation: 'inlineScript'
+        inlineScript: 'az storage account keys list  --account-name nextcloudjimmystorage --resource-group nextcloud --query [0].value'
+    - task: AzureCLI@2
+      displayName: Deploy App Service and Partially Configure
+      inputs:
+        azureSubscription: 'cccis-jlindsey-sandbox(ff95cccd-cbb7-41a2-b4ba-41917218c03c)'
+        scriptType: 'pscore'
+        scriptLocation: 'scriptPath'
+        scriptPath: '$(System.DefaultWorkingDirectory)/deployandConfigAppService.ps1'
+        arguments: '-ResourceBaseName $(ResourceBaseName) -ResourceGroupName $(ResourceGroupName) -Location "$(Location)" -DBAdminName $(DBAdminName) -DBPassword $(DBPassword) -SFTPPassword $(SFTPPassword) -NextcloudAdminName $(NextcloudAdminName) -NextcloudAdminPassword $(NextcloudAdminPassword) -UseDockerCompose $(UseDockerCompose)'
+        workingDirectory: '$(System.DefaultWorkingDirectory)'
