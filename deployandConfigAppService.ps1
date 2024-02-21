@@ -4,7 +4,7 @@
     Creates all the resources we need to create an Nextcloud instance on Azure Web Apps using Containers
 
 .Example
-    ./deployandConfigAppService.ps1 -ResourceBaseName nextcloud -ResourceGroupName nextcloud -Location "Central US" -DBdminName ncadmin -DBPassword <password> -SFTPPassword <password>
+    ./deployandConfigAppService.ps1 -ResourceBaseName blogifier -ResourceGroupName blogifier -Location "Central US" -DBdminName mySqlAdmin -DBPassword <password> -VnetName blogifier-vnet -SubnetName app
 #>
 param(
     [Parameter(Mandatory=$true)][string]$ResourceBaseName,
@@ -13,8 +13,7 @@ param(
     [Parameter(Mandatory=$true)][string]$DBAdminName,
     [Parameter(Mandatory=$true)][string]$DBPassword,
     [Parameter(Mandatory=$true)][string]$VnetName,
-    [Parameter(Mandatory=$true)][string]$SubnetName,
-    [Parameter(Mandatory=$true)][bool]$UseDockerCompose
+    [Parameter(Mandatory=$true)][string]$SubnetName
 )
 
 $mySQlServerName = $ResourceBaseName
@@ -25,14 +24,8 @@ $appName = "${ResourceBaseName}jimmy"
 az appservice plan create --name $appName --resource-group $ResourceGroupName --is-linux --location $Location --sku P1V3
 
 # Creates the web app
-if($UseDockerCompose)
-{
-    az webapp create --name $appName --plan $appName --resource-group $ResourceGroupName --multicontainer-config-type compose --multicontainer-config-file docker_compose.yml
-}
-else
-{
-    az webapp create --name $appName --plan $appName --resource-group $ResourceGroupName --deployment-container-image-name "dorthl/blogifier:latest"
-}
+az webapp create --name $appName --plan $appName --resource-group $ResourceGroupName --deployment-container-image-name "dorthl/blogifier:latest"
+
 
 # Stops the Web app
 az webapp stop --name $appName --resource-group $ResourceGroupName

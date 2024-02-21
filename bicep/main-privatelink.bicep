@@ -194,6 +194,24 @@ param redisPublicNetworkAccess string = 'Disabled'
 
 var redisSkuFamily = redisSkuName == 'Premium' ? 'P' : 'C'
 
+resource prviateLink 'Microsoft.Network/privateLinkServices@2023-09-01' = {
+  name: resourceBaseName
+  location: location
+  properties: {
+    enableProxyProtocol: false
+    ipConfigurations: [
+      {
+        name: 'RedisPrivateLink'
+        properties: {
+          subnet: {
+            id: virtualNetwork.properties.subnets[2].id
+          }
+        }
+      }
+    ]
+  }
+}
+
 resource redisCache 'Microsoft.Cache/redis@2023-08-01' = {
   location: location
   name: toLower(resourceBaseName)
@@ -208,6 +226,5 @@ resource redisCache 'Microsoft.Cache/redis@2023-08-01' = {
       family: redisSkuFamily
       name: redisSkuName
     }
-    subnetId: redisSkuName == 'Premium' ? virtualNetwork.properties.subnets[2].id : null
   }
 }

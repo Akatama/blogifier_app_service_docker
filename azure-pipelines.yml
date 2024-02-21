@@ -24,5 +24,5 @@ jobs:
         scriptType: 'pscore'
         scriptLocation: 'scriptPath'
         scriptPath: '$(System.DefaultWorkingDirectory)/deployandConfigAppService.ps1'
-        arguments: '-ResourceBaseName $(ResourceBaseName) -ResourceGroupName $(ResourceGroupName) -Location "$(Location)" -DBAdminName $(DBAdminName) -DBPassword $(DBPassword) -VnetName $(VnetName) -SubnetName $(SubnetName) -UseDockerCompose $false'
+        arguments: '-ResourceBaseName $(ResourceBaseName) -ResourceGroupName $(ResourceGroupName) -Location "$(Location)" -DBAdminName $(DBAdminName) -DBPassword $(DBPassword) -VnetName $(VnetName) -SubnetName $(SubnetName)'
         workingDirectory: '$(System.DefaultWorkingDirectory)'
