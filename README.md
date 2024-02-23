@@ -20,7 +20,9 @@ I make heavy use of pipeline variables. Here are what you need add to your pipel
 6. SubnetName
 7. VnetName
 
-Future Work:
+## Future Work:
+#### Try out Azure Private Link for the Redis Cache
 Currently, the Redis cache is able to be accessed by the Azure Web App because it is either open to public access, or it is a Premium tier Redis cache and can be attached to a subnet. I want to use Azure Private Link Service to attach the Redis cache to the subnet no matter if it is Premium or not.
 
+#### Try out Azure Key Vault for Database password
 I have to pass around the Database password in order to allow the Azure Web App to access. The Redis Cache the password is handled by Azure, so I can use Azure CLI calls to access it. I want to look into Azure Key Vault and see if there is a more secure way I can handle the database password.
