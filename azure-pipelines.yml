@@ -24,5 +24,5 @@ jobs:
         scriptType: 'pscore'
         scriptLocation: 'scriptPath'
         scriptPath: '$(System.DefaultWorkingDirectory)/deployandConfigAppService.ps1'
-        arguments: '-ResourceBaseName $(ResourceBaseName) -ResourceGroupName $(ResourceGroupName) -Location "$(Location)" -DBAdminName $(DBAdminName) -KeyVaultName ${KeyVaultName} -AdminPasswordSecretName mySqlAdminPassword -VnetName $(VnetName) -SubnetName $(SubnetName)'
+        arguments: '-ResourceBaseName $(ResourceBaseName) -ResourceGroupName $(ResourceGroupName) -Location "$(Location)" -DBAdminName $(DBAdminName) -KeyVaultName $(KeyVaultName) -AdminPasswordSecretName mySqlAdminPassword -VnetName $(VnetName) -SubnetName $(SubnetName)'
         workingDirectory: '$(System.DefaultWorkingDirectory)'
