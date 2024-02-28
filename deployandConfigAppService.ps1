@@ -11,7 +11,8 @@ param(
     [Parameter(Mandatory=$true)][string]$ResourceGroupName,
     [Parameter(Mandatory=$true)][string]$Location,
     [Parameter(Mandatory=$true)][string]$DBAdminName,
-    [Parameter(Mandatory=$true)][string]$DBPassword,
+    [Parameter(Mandatory=$true)][string]$KeyVaultName,
+    [Parameter(Mandatory=$true)][string]$AdminPasswordSecretName,
     [Parameter(Mandatory=$true)][string]$VnetName,
     [Parameter(Mandatory=$true)][string]$SubnetName
 )
@@ -48,6 +49,10 @@ $redisHostname = az redis show --name ${redisCacheName} --resource-group ${Resou
 $redisHostname = $redisHostname -replace "`"", ""
 $redisKey = az redis list-keys --name ${redisCacheName} --resource-group ${ResourceGroupName} --query 'primaryKey'
 $redisKey = $redisKey -replace "`"", ""
+
+# Get the Database Password name from Azure Key Vault
+$DBPassword = az keyvault secret show --vault-name $KeyVaultName --name $AdminPasswordSecretName --query 'value'
+$DBPassword = $DBPassword -replace "`"", ""
 
 # Add the webapp app settings
 az webapp config appsettings set --name $appName --resource-group $ResourceGroupName --settings TZ="America/Los_Angeles" Blogifier__DbProvider="MySql" `

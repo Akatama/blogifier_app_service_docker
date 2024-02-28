@@ -16,7 +16,6 @@ param dbSubnetName string = 'database'
 @description('Provide Subnet Address Prefix')
 param dbSubnetPrefix string = '10.1.1.0/24'
 
-
 @description('Subnet we will attach our database to')
 param cacheSubnetName string = 'cache'
 
@@ -63,18 +62,27 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2023-05-01' = {
   }
 }
 
+@description('The Key Vault resource group')
+param keyVaulResourceGroupName string = 'key-vault'
+
+@description('The Key Vault name')
+param keyVaultName string = 'jimmykeys'
+
+@description('Provide the key name that coincides with the admin password')
+param adminPasswordSecretName string
+
+resource keyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
+  name: keyVaultName
+  scope: resourceGroup(keyVaulResourceGroupName)
+}
+
 @description('Name base name of the resources')
 param resourceBaseName string
 
 param location string = 'Central US'
 
 @description('Provide the administrator login name for the MySQL server.')
-param administratorLogin string
-
-@description('Provide the administrator login password for the MySQL server.')
-@secure()
-param administratorLoginPassword string
-
+param adminLogin string
 
 @description('The tier of the particular SKU. High Availability is available only for GeneralPurpose and MemoryOptimized sku.')
 @allowed([
@@ -126,44 +134,26 @@ param geoRedundantBackup string = 'Disabled'
 
 param databaseName string = 'blogifier'
 
-resource mySQLServer 'Microsoft.DBforMySQL/flexibleServers@2023-06-30' = {
-  name: toLower(resourceBaseName)
-  location: location
-  sku: {
-    name: databaseSkuName
-    tier: serverEdition
-  }
-  properties: {
-    version: serverVersion
-    administratorLogin: administratorLogin
-    administratorLoginPassword: administratorLoginPassword
+module mySql 'modules/mySql.bicep' = {
+  name: 'mySql-${resourceBaseName}'
+  params: {
+    mySqlName: resourceBaseName
+    adminLogin: adminLogin
+    adminPassword: keyVault.getSecret(adminPasswordSecretName)
+    location: location
     availabilityZone: availabilityZone
-    highAvailability: {
-      mode: haEnabled
-      standbyAvailabilityZone: standbyAvailabilityZone
-    }
-    storage: {
-      storageSizeGB: storageSizeGB
-      iops: storageIops
-      autoGrow: storageAutogrow
-    }
-    backup: {
-      backupRetentionDays: backupRetentionDays
-      geoRedundantBackup: geoRedundantBackup
-    }
-    network: {
-      delegatedSubnetResourceId: virtualNetwork.properties.subnets[1].id
-    }
-  }
-}
-
-resource nextcloud_database 'Microsoft.DBforMySQL/flexibleServers/databases@2023-06-30' = {
-  parent: mySQLServer
-  name: databaseName
-  properties: {
-    charset: 'utf8mb4'
-    collation: 'utf8mb4_unicode_ci'
-
+    backupRetentionDays: backupRetentionDays
+    databaseName: databaseName
+    databaseSkuName: databaseSkuName
+    geoRedundantBackup: geoRedundantBackup
+    haEnabled: haEnabled
+    serverEdition: serverEdition
+    serverVersion: serverVersion
+    standbyAvailabilityZone: standbyAvailabilityZone
+    storageAutogrow: storageAutogrow
+    storageIops: storageIops
+    storageSizeGB: storageSizeGB
+    dbSubnetId: virtualNetwork.properties.subnets[1].id
   }
 }
 
@@ -192,22 +182,14 @@ param redisSkuCapcity int = 1
 ])
 param redisPublicNetworkAccess string = 'Disabled'
 
-var redisSkuFamily = redisSkuName == 'Premium' ? 'P' : 'C'
-
-resource redisCache 'Microsoft.Cache/redis@2023-08-01' = {
-  location: location
-  name: toLower(resourceBaseName)
-  properties: {
-    enableNonSslPort: true
-    publicNetworkAccess: redisPublicNetworkAccess
-    redisConfiguration: {
-
-    }
-    sku: {
-      capacity: redisSkuCapcity
-      family: redisSkuFamily
-      name: redisSkuName
-    }
-    subnetId: redisSkuName == 'Premium' ? virtualNetwork.properties.subnets[2].id : null
+module redis 'modules/redis.bicep' = {
+  name: 'redis-${resourceBaseName}'
+  params: {
+    location: location
+    redisName: resourceBaseName
+    redisPublicNetworkAccess: redisPublicNetworkAccess
+    redisSkuCapcity: redisSkuCapcity
+    redisSkuName: redisSkuName
+    cacheSubnetId: virtualNetwork.properties.subnets[2].id
   }
 }
