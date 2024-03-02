@@ -7,16 +7,16 @@ jobs:
   - job: Run_App_Service_Deploy_Script
     timeoutInMinutes: 30
     steps:
-    # - task: AzurePowerShell@5
-    #   inputs:
-    #     azureSubscription: 'cccis-jlindsey-sandbox(ff95cccd-cbb7-41a2-b4ba-41917218c03c)'
-    #     ScriptType: 'InlineScript'
-    #     azurePowerShellVersion: 'LatestVersion'
-    #     pwsh: true
-    #     Inline: |
-    #       New-AzResourceGroup -ResourceGroupName $(ResourceGroupName) -Location "$(Location)"
-    #       $DBAdminPassword = ConvertTo-SecureString $(DBPassword) -AsPlainText -Force
-    #       New-AzResourceGroupDeployment -ResourceGroupName $(ResourceGroupName) -Name main -TemplateFile $(System.DefaultWorkingDirectory)/bicep/main.bicep -resourceBaseName $(ResourceBaseName) -location "$(Location)" -vnetName $(VnetName) -adminLogin $(DBAdminName) -adminPasswordSecretName mySqlAdminPassword
+    - task: AzurePowerShell@5
+      inputs:
+        azureSubscription: 'cccis-jlindsey-sandbox(ff95cccd-cbb7-41a2-b4ba-41917218c03c)'
+        ScriptType: 'InlineScript'
+        azurePowerShellVersion: 'LatestVersion'
+        pwsh: true
+        Inline: |
+          New-AzResourceGroup -ResourceGroupName $(ResourceGroupName) -Location "$(Location)"
+          $DBAdminPassword = ConvertTo-SecureString $(DBPassword) -AsPlainText -Force
+          New-AzResourceGroupDeployment -ResourceGroupName $(ResourceGroupName) -Name main -TemplateFile $(System.DefaultWorkingDirectory)/bicep/main.bicep -resourceBaseName $(ResourceBaseName) -location "$(Location)" -vnetName $(VnetName) -adminLogin $(DBAdminName) -adminPasswordSecretName mySqlAdminPassword
     - task: AzureKeyVault@2
       inputs:
         azureSubscription: 'cccis-jlindsey-sandbox(ff95cccd-cbb7-41a2-b4ba-41917218c03c)'
