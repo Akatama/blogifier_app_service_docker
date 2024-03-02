@@ -4,9 +4,10 @@
 #### Manual
 1. Create a resource group
 2. Call main.bicep with either the Azure CLI or Azure PowerShell
-  New-AzResourceGroupDeployment -ResourceGroupName "blogifier" -Name main -TemplateFile ./bicep/main.bicep -resourceBaseName blogifier -location "Central US" -vnetName "blogifier-vnet" -adminLogin mysqlAdmin -adminPasswordSecretName mySqlAdminPassword  
-3. Run deployandconfigAppService.ps1
-  ./deployandConfigAppService.ps1 -ResourceBaseName blogifier -ResourceGroupName blogifier -Location "Central US" -DBAdminName mysqlAdmin -KeyVaultName <keyvaultname> -AdminPasswordSecretName mySqlAdminPassword -VnetName blogifier-vnet -SubnetName app
+  New-AzResourceGroupDeployment -ResourceGroupName "blogifier" -Name main -TemplateFile ./bicep/main.bicep -resourceBaseName blogifier -location "Central US" -vnetName "blogifier-vnet" -adminLogin mysqlAdmin -adminPasswordSecretName mySqlAdminPassword
+3. Call Key Vault to get the password, we will call it <password> here
+4. Run deployandconfigAppService.ps1
+  ./deployandConfigAppService.ps1 -ResourceBaseName blogifier -ResourceGroupName blogifier -Location "Central US" -DBAdminName mysqlAdmin -DBPassword <password> -VnetName blogifier-vnet -SubnetName app
 
 #### Azure Pipelines YAML
 You can look at the example YAML pipeline I have created. This does the same above steps
@@ -19,6 +20,7 @@ I make heavy use of pipeline variables. Here are what you need add to your pipel
 5. ResourceGroupName
 6. SubnetName
 7. VnetName
+8. The name of the passowrd in the keyvault (mySqlAdminPassword)
 
 ## Future Work:
 #### Try out Azure Private Link for the Redis Cache
