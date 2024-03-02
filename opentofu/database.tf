@@ -3,11 +3,6 @@ variable "AdminUserName" {
   description = "Administrator username for the DB"
 }
 
-variable "AdminPassword" {
-    type = string
-    description = "Administrator password for the DB"
-}
-
 variable "ServerEdition" {
     type = string
     description = "The tier of the particular SKU. Valid values are B for Burstable, GP for GeneralPurpose and MO for Memory Optimized. High Availability is available for GeneralPurpose and MemoryOptimized sku."
@@ -83,7 +78,7 @@ resource "azurerm_mysql_flexible_server" "mysql_server" {
     sku_name = "${var.ServerEdition}_${var.DBSkuName}"
     version = var.ServerVersion
     administrator_login = var.AdminUserName
-    administrator_password = var.AdminPassword
+    administrator_password = data.azurerm_key_vault_secret.my_sql_admin_password.value
     zone = var.AvailabilityZone
 
     storage {
