@@ -17,6 +17,12 @@ jobs:
           New-AzResourceGroup -ResourceGroupName $(ResourceGroupName) -Location "$(Location)"
           $DBAdminPassword = ConvertTo-SecureString $(DBPassword) -AsPlainText -Force
           New-AzResourceGroupDeployment -ResourceGroupName $(ResourceGroupName) -Name main -TemplateFile $(System.DefaultWorkingDirectory)/bicep/main.bicep -resourceBaseName $(ResourceBaseName) -location "$(Location)" -vnetName $(VnetName) -adminLogin $(DBAdminName) -adminPasswordSecretName mySqlAdminPassword
+    - task: AzureKeyVault@2
+      inputs:
+        azureSubscription: 'cccis-jlindsey-sandbox(1)(ff95cccd-cbb7-41a2-b4ba-41917218c03c)'
+        KeyVaultName: 'jimmykeys'
+        SecretsFilter: 'mySqlAdminPassword'
+        RunAsPreJob: false
     - task: AzureCLI@2
       displayName: Deploy App Service and Partially Configure
       inputs:
@@ -24,5 +30,5 @@ jobs:
         scriptType: 'pscore'
         scriptLocation: 'scriptPath'
         scriptPath: '$(System.DefaultWorkingDirectory)/deployandConfigAppService.ps1'
-        arguments: '-ResourceBaseName $(ResourceBaseName) -ResourceGroupName $(ResourceGroupName) -Location "$(Location)" -DBAdminName $(DBAdminName) -KeyVaultName $(KeyVaultName) -AdminPasswordSecretName mySqlAdminPassword -VnetName $(VnetName) -SubnetName $(SubnetName)'
+        arguments: '-ResourceBaseName $(ResourceBaseName) -ResourceGroupName $(ResourceGroupName) -Location "$(Location)" -DBAdminName $(DBAdminName) -DBPassword $(mySqlAdminPassword) -VnetName $(VnetName) -SubnetName $(SubnetName)'
         workingDirectory: '$(System.DefaultWorkingDirectory)'
