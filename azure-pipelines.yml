@@ -15,7 +15,6 @@ jobs:
         pwsh: true
         Inline: |
           New-AzResourceGroup -ResourceGroupName $(ResourceGroupName) -Location "$(Location)"
-          $DBAdminPassword = ConvertTo-SecureString $(DBPassword) -AsPlainText -Force
           New-AzResourceGroupDeployment -ResourceGroupName $(ResourceGroupName) -Name main -TemplateFile $(System.DefaultWorkingDirectory)/bicep/main.bicep -resourceBaseName $(ResourceBaseName) -location "$(Location)" -vnetName $(VnetName) -adminLogin $(DBAdminName) -adminPasswordSecretName mySqlAdminPassword
     - task: AzureKeyVault@2
       inputs:
