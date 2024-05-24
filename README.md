@@ -13,7 +13,7 @@ I have my Azure Key Vault open to Public Access from all networks, but I do have
   ./deployandConfigAppService.ps1 -ResourceBaseName blogifier -ResourceGroupName blogifier -Location "Central US" -DBAdminName mysqlAdmin -DBPassword <password> -VnetName blogifier-vnet -SubnetName app
 
 #### Azure Pipelines YAML
-Note: If you are using Azure Key Vault, you will need to set it up so that your App Registration (or whatver Service Principal you are using to access the Vault) has access. I personally use Azure RBAC. All I did there was go to my Subscription -> Access control (IAM) -> Add -> Add role assignment -> Key Vault Secrets User -> Assing to App Registration. If you are not using Azure RBAC, you can follow this guide: https://learn.microsoft.com/en-us/azure/devops/pipelines/release/key-vault-in-own-project?view=azure-devops&tabs=portal
+Note: If you are using Azure Key Vault, you will need to set it up so that your App Registration (or whatver Service Principal you are using to access the Vault) has access. I personally use Azure RBAC. All I did there was go to my Subscription -> Access control (IAM) -> Add -> Add role assignment -> Key Vault Secrets User -> Assign to App Registration. If you are not using Azure RBAC, you can follow this guide: https://learn.microsoft.com/en-us/azure/devops/pipelines/release/key-vault-in-own-project?view=azure-devops&tabs=portal
 
 You can look at the example YAML pipeline I have created. This does the same above steps
 I make heavy use of pipeline variables. Here are what you need add to your pipeline
