@@ -13,8 +13,9 @@ I have my Azure Key Vault open to Public Access from all networks, but I do have
   ./deployandConfigAppService.ps1 -ResourceBaseName blogifier -ResourceGroupName blogifier -Location "Central US" -DBAdminName mysqlAdmin -DBPassword <password> -VnetName blogifier-vnet -SubnetName app
 
 Here's an example command for Step 2:
-  New-AzResourceGroupDeployment -ResourceGroupName "blogifier" -Name main -TemplateFile ./bicep/main.bicep -resourceBaseName blogifier -location "Central US" -vnetName "blogifier-vnet" -adminLogin mysqlAdmin -adminPasswordSecretName mySqlAdminPassword
-
+```
+New-AzResourceGroupDeployment -ResourceGroupName "blogifier" -Name main -TemplateFile ./bicep/main.bicep -resourceBaseName blogifier -location "Central US" -vnetName "blogifier-vnet" -adminLogin mysqlAdmin -adminPasswordSecretName mySqlAdminPassword
+```
 #### Azure Pipelines YAML
 Note: If you are using Azure Key Vault, you will need to set it up so that your App Registration (or whatver Service Principal you are using to access the Vault) has access. I personally use Azure RBAC. All I did there was go to my Subscription -> Access control (IAM) -> Add -> Add role assignment -> Key Vault Secrets User -> Assign to App Registration. If you are not using Azure RBAC, you can follow this guide: https://learn.microsoft.com/en-us/azure/devops/pipelines/release/key-vault-in-own-project?view=azure-devops&tabs=portal
 
