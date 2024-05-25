@@ -7,9 +7,10 @@ I have my Azure Key Vault open to Public Access from all networks, but I do have
 #### Manual
 1. Create a resource group
 2. Call main.bicep with either the Azure CLI or Azure PowerShell -OR- call the files in the opentofu folder with OpenTofu or Terraform
+   
   New-AzResourceGroupDeployment -ResourceGroupName "blogifier" -Name main -TemplateFile ./bicep/main.bicep -resourceBaseName blogifier -location "Central US" -vnetName "blogifier-vnet" -adminLogin mysqlAdmin -adminPasswordSecretName mySqlAdminPassword
-3. Call Key Vault to get the password, we will call it <password> here
-4. Run deployandconfigAppService.ps1
+4. Call Azure Key Vault to get the password, we will call it <password> here
+5. Run deployandconfigAppService.ps1
   ./deployandConfigAppService.ps1 -ResourceBaseName blogifier -ResourceGroupName blogifier -Location "Central US" -DBAdminName mysqlAdmin -DBPassword <password> -VnetName blogifier-vnet -SubnetName app
 
 #### Azure Pipelines YAML
